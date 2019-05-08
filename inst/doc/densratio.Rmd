@@ -1,10 +1,10 @@
 ---
-title: "densratio - An R Package for Density Ratio Estimation"
+title: "An R Package for Density Ratio Estimation"
 author: "Koji MAKIYAMA (@hoxo_m)"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{densratio - An R Package for Density Ratio Estimation}
+  %\VignetteIndexEntry{An R Package for Density Ratio Estimation}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,17 +16,19 @@ library(mvtnorm)
 
 ## 1. Overview
 
-**Density ratio estimation** is described as follows: for given two data samples $x$ and $y$ from unknown distributions $p_{nu}(x)$ and $p_{de}(y)$ respectively, estimate
+**Density ratio estimation** is described as follows: for given two data samples $x$ and $y$ from unknown distributions $p(x)$ and $q(y)$ respectively, estimate
 
 $$
-w(x) = \frac{p_{nu}(x)}{p_{de}(x)}
+w(x) = \frac{p(x)}{q(x)}
 $$
 
 where $x$ and $y$ are $d$-dimensional real numbers.
 
-The estimated density ratio function $w(x)$ can be used in many applications such as the inlier-based outlier detection[1], covariate shift adaptation[2] and etc[3].
+The estimated density ratio function $w(x)$ can be used in many applications such as anomaly detection [1] and covariate shift adaptation [2].
+Other useful applications about density ratio estimation were summarized by Sugiyama et al. (2012) [3].
 
-The package **densratio** provides a function `densratio()` that returns a result has the function to estimate density ratio `compute_density_ratio()`.
+The package **densratio** provides a function `densratio()`.
+The function outputs an object that has a function to estimate density ratio.
 
 For example, 
 
@@ -37,32 +39,45 @@ y <- rnorm(200, mean = 1, sd = 1/2)
 
 library(densratio)
 result <- densratio(x, y)
-result
 ```
 
-In this case, the true density ratio $w(x)$ is known, so we can compare $w(x)$ with the estimated density ratio $\hat{w}(x)$.
+The function `densratio()` estimates the density ratio of $p(x)$ to $q(y)$,
+$$
+w(x) = \frac{p(x)}{q(y)} = \frac{\rm{Norm}(1, 1/8)}{\rm{Norm}(1, 1/2)}
+$$
+and provides a function to compute estimated density ratio.
+The `result` object has a function `compute_density_ratio()` that can compute the estimated density ratio $\hat{w}(x) \simeq p(x)/q(y)$ for any $d$-dimensional input $x$ (now $d=1$).
+
+```{r fig.width=5, fig.height=4}
+new_x <- seq(0, 2, by = 0.05)
+w_hat <- result$compute_density_ratio(new_x)
+
+plot(new_x, w_hat, pch=19)
+```
+
+In this case, the true density ratio $w(x) = p(x)/q(y) = \rm{Norm}(1, 1/8) / \rm{Norm}(1, 1/2)$ can be computed precisely.
+So we can compare $w(x)$ with the estimated density ratio $\hat{w}(x)$.
 
 ```{r fig.width=5, fig.height=4}
 true_density_ratio <- function(x) dnorm(x, 1, 1/8) / dnorm(x, 1, 1/2)
-estimated_density_ratio <- result$compute_density_ratio
 
 plot(true_density_ratio, xlim=c(-1, 3), lwd=2, col="red", xlab = "x", ylab = "Density Ratio")
-plot(estimated_density_ratio, xlim=c(-1, 3), lwd=2, col="green", add=TRUE)
+plot(result$compute_density_ratio, xlim=c(-1, 3), lwd=2, col="green", add=TRUE)
 legend("topright", legend=c(expression(w(x)), expression(hat(w)(x))), col=2:3, lty=1, lwd=2, pch=NA)
 ```
 
 ## 2. How to Install
 
-You can install the **densratio** package from CRAN.
+You can install the **densratio** package from [CRAN](https://CRAN.R-project.org/package=densratio).
 
 ```{r eval=FALSE}
 install.packages("densratio")
 ```
 
-You can also install the package from GitHub.
+You can also install the package from [GitHub](https://github.com/hoxo-m/densratio).
 
 ```{r eval=FALSE}
-install.packages("devtools") # if you have not installed "devtools" package
+install.packages("devtools") # If you have not installed "devtools" package
 devtools::install_github("hoxo-m/densratio")
 ```
 
@@ -74,31 +89,42 @@ The source code for **densratio** package is available on GitHub at
 
 ### 3.1. Basics
 
-The package provides `densratio()` that the result has the function to estimate density ratio.
+The package **densratio** provides a function `densratio()`.
+The function outputs an object that has a function to estimate density ratio.
 
 For data samples `x` and `y`,
 
 ```{r eval=FALSE}
 library(densratio)
 
+x <- rnorm(200, mean = 1, sd = 1/8)
+y <- rnorm(200, mean = 1, sd = 1/2)
+
 result <- densratio(x, y)
 ```
 
-In this case, `result$compute_density_ratio()` is the function to compute estimated density ratio.
+Here, `result$compute_density_ratio()` is the function to compute estimated density ratio.
+
+```{r fig.width=5, fig.height=4}
+new_x <- seq(0, 2, by = 0.05)
+w_hat <- result$compute_density_ratio(new_x)
+
+plot(new_x, w_hat, pch=19)
+```
 
 ### 3.2. Methods
 
-`densratio()` has `method` parameter that you can pass `"uLSIF"` or `"KLIEP"`.
+`densratio()` has `method` argument that you can pass `"uLSIF"` or `"KLIEP"`.
 
 - **uLSIF** (unconstrained Least-Squares Importance Fitting) is the default method.
-This method estimates density ratio by minimizing the squared loss.
-You can find more information in Hido(2011)[1].
+This algorithm estimates density ratio by minimizing the squared loss.
+You can find more information in Hido et al. (2011) [1].
 
 - **KLIEP** (Kullback-Leibler Importance Estimation Procedure) is the anothor method.
-This method estimates density ratio by minimizing Kullback-Leibler divergence.
-You can find more information in Sugiyama(2007)[2].
+This algorithm estimates density ratio by minimizing Kullback-Leibler divergence.
+You can find more information in Sugiyama et al. (2007) [2].
 
-The both methods assume that the denity ratio is represented by linear model: 
+The both methods assume that density ratio are represented by linear model
 
 $$
 w(x) = \alpha_1 K(x, c_1) + \alpha_2 K(x, c_2) + ... + \alpha_b K(x, c_b)
@@ -112,31 +138,32 @@ $$
 
 is the Gaussian RBF.
 
-`densratio()` performs the two main jobs:
+`densratio()` performs two main jobs:
 
-- First, deciding kernel parameter $\sigma$ by cross validation,
-- Second, optimizing kernel weights $\alpha$.
+- First, decide kernel parameter $\sigma$ by cross validation.
+- Second, find the optimal kernel weights $\alpha_i$ (in other words, find the optimal coefficients of the linear model).
 
-As the result, you can obtain `compute_density_ratio()`.
+$\sigma$ and $\alpha_i$ are saved into result objects of `densratio()`, and used to compute estimated density ratio in `compute_density_ratio()`.
 
-### 3.3. Result and Paremeter Settings
+### 3.3. Result and Arguments
 
-`densratio()` outputs the result like as follows:
+You can `print()` result objects of `densratio()` to see information.
+Moreover, you can change some conditions to specify arguments of `densratio()`.
 
-```{r echo=FALSE}
-result
+```{r}
+print(result)
 ```
 
 - **Kernel type** is fixed by Gaussian RBF.
-- **Number of kernels** is the number of kernels in the linear model. You can change by setting `kernel_num` parameter. In default, `kernel_num = 100`.
+- **Number of kernels** is the number of kernels in the linear model. You can change by setting `kernel_num` argument. In default, `kernel_num = 100`.
 - **Bandwidth(sigma)** is the Gaussian kernel bandwidth. In default, `sigma = "auto"`, the algorithms automatically select the optimal value by cross validation. If you set `sigma` a single number, it will be used. If you set a numeric vector, the algorithms select the optimal value in them by cross validation.
-- **Centers** are centers of Gaussian kernels in the linear model. These are selected at random from the data sample `x` underlying a numerator distribution `p_nu(x)`. You can find the whole values in `result$kernel_info$centers`. 
-- **Kernel weights** is the alpha parameters in the linear model. It was optimaized by the algorithms. You can find the whole values in `result$alpha`. 
+- **Centers** are centers of Gaussian kernels in the linear model. These are selected at random from the data sample `x` underlying a numerator distribution $p(x)$. You can find the whole values in `result$kernel_info$centers`. 
+- **Kernel weights** are the alpha parameters in the linear model. They have been optimaized by the algorithms. You can find the whole values in `result$alpha`. 
 - **The funtion to estimate density ratio** is named `compute_density_ratio()`.
 
 ## 4. Multi Dimensional Data Samples
 
-In the above, the input data samples `x` and `y` were one dimensional.
+So far, the input data samples `x` and `y` were one dimensional.
 `densratio()` allows to input multidimensional data samples as `matrix`.
 
 For example,
@@ -160,18 +187,16 @@ true_density_ratio <- function(x) {
   dmvnorm(x, mean = c(1, 1), sigma = diag(1/8, 2)) /
     dmvnorm(x, mean = c(1, 1), sigma = diag(1/2, 2))
 }
-estimated_density_ratio <- result$compute_density_ratio
 
 N <- 20
 range <- seq(0, 2, length.out = N)
 input <- expand.grid(range, range)
-z_true <- matrix(true_density_ratio(input), nrow = N)
-z_hat <- matrix(estimated_density_ratio(input), nrow = N)
+w_true <- matrix(true_density_ratio(input), nrow = N)
+w_hat <- matrix(result$compute_density_ratio(input), nrow = N)
 
-old_par <- par(mfrow = c(1, 2))
-contour(range, range, z_true, main = "True Density Ratio")
-contour(range, range, z_hat, main = "Estimated Density Ratio")
-par(old_par)
+par(mfrow = c(1, 2))
+contour(range, range, w_true, main = "True Density Ratio")
+contour(range, range, w_hat, main = "Estimated Density Ratio")
 ```
 
 The dimensions of `x` and `y` must be same.

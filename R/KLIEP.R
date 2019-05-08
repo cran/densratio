@@ -1,13 +1,13 @@
-#' Estimate Density Ratio p_nu(x)/p_de(y) by KLIEP (Kullback-Leibler Importance Estimation Procedure)
+#' Estimate Density Ratio p(x)/q(y) by KLIEP (Kullback-Leibler Importance Estimation Procedure)
 #'
-#' @param x numeric vector or matrix as data from a numerator distribution p_nu(x).
-#' @param y numeric vector or matrix as data from a denominator distribution p_de(y).
-#' @param sigma positive numeric vector as a search range of Gaussian kernel bandwidth.
-#' @param kernel_num positive integer as number of kernels.
-#' @param fold positive integer as a numer of the folds of cross validation.
+#' @param x numeric vector or matrix. Data from a numerator distribution p(x).
+#' @param y numeric vector or matrix. Data from a denominator distribution q(y).
+#' @param sigma positive numeric vector. Search range of Gaussian kernel bandwidth.
+#' @param kernel_num positive integer. Number of kernels.
+#' @param fold positive integer. Numer of the folds of cross validation.
 #' @param verbose logical(default TRUE).
 #'
-#' @return KLIEP object that contains the function to estimate density ratio.
+#' @return KLIEP object that contains a function to compute estimated density ratio.
 #'
 #' @export
 KLIEP <- function(x, y, sigma = "auto", kernel_num = 100, fold = 5, verbose = TRUE) {
@@ -17,7 +17,6 @@ KLIEP <- function(x, y, sigma = "auto", kernel_num = 100, fold = 5, verbose = TR
   if(ncol(x) != ncol(y)) stop("x and y must be same dimensions.")
 
   nx <- nrow(x)
-
   kernel_num <- min(kernel_num, nx)
   centers <- x[sample(nx, size = kernel_num), , drop = FALSE]
 
@@ -25,7 +24,7 @@ KLIEP <- function(x, y, sigma = "auto", kernel_num = 100, fold = 5, verbose = TR
     if(verbose) message("Searching optimal sigma and lambda...")
     sigma <- KLIEP_search_sigma(x, y, centers, fold, verbose)
     if(verbose) message(sprintf("Found optimal sigma = %.5f.", sigma))
-  } else if(length(sigma) != 1) {
+  } else if(length(sigma) > 1) {
     if(verbose) message("Searching optimal sigma and lambda...")
     sigma <- KLIEP_search_sigma_list(x, y, centers, sigma, fold, verbose)
     if(verbose) message(sprintf("Found optimal sigma = %.5f.", sigma))

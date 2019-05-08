@@ -1,13 +1,13 @@
-#' Estimate Density Ratio p_nu(x)/p_de(y) by uLSIF (unconstrained Least-Square Importance Fitting)
+#' Estimate Density Ratio p(x)/q(y) by uLSIF (unconstrained Least-Square Importance Fitting)
 #'
-#' @param x numeric vector or matrix as data from a numerator distribution p_nu(x).
-#' @param y numeric vector or matrix as data from a denominator distribution p_de(y).
-#' @param sigma positive numeric vector as a search range of Gaussian kernel bandwidth.
-#' @param lambda positive numeric vector as a search range of regularization parameter.
-#' @param kernel_num positive integer as number of kernels.
+#' @param x numeric vector or matrix. Data from a numerator distribution p(x).
+#' @param y numeric vector or matrix. Data from a denominator distribution q(y).
+#' @param sigma positive numeric vector. Search range of Gaussian kernel bandwidth.
+#' @param lambda positive numeric vector. Search range of regularization parameter.
+#' @param kernel_num positive integer. Number of kernels.
 #' @param verbose logical(default TRUE).
 #'
-#' @return uLSIF object that contains the function to estimate density ratio.
+#' @return uLSIF object that contains a function to compute estimated density ratio.
 #'
 #' @export
 uLSIF <- function(x, y,
@@ -19,6 +19,7 @@ uLSIF <- function(x, y,
   if(is.vector(x)) x <- matrix(x)
   if(is.vector(y)) y <- matrix(y)
   if(ncol(x) != ncol(y)) stop("x and y must be same dimensions.")
+
   nx <- nrow(x)
   ny <- nrow(y)
 

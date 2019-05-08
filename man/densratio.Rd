@@ -2,39 +2,43 @@
 % Please edit documentation in R/densratio.R
 \name{densratio}
 \alias{densratio}
-\title{Estimate Density Ratio p_nu(x)/p_de(y)}
+\title{Estimate Density Ratio p(x)/q(y)}
 \usage{
 densratio(x, y, method = c("uLSIF", "KLIEP"), sigma = "auto",
   lambda = "auto", kernel_num = 100, fold = 5, verbose = TRUE)
 }
 \arguments{
-\item{x}{numeric vector or matrix as data from a numerator distribution p_nu(x).}
+\item{x}{numeric vector or matrix. Data from a numerator distribution p(x).}
 
-\item{y}{numeric vector or matrix as data from a denominator distribution p_de(y).}
+\item{y}{numeric vector or matrix. Data from a denominator distribution q(y).}
 
 \item{method}{"uLSIF"(default) or "KLIEP".}
 
-\item{sigma}{positive numeric vector as a search range of Gaussian kernel bandwidth.}
+\item{sigma}{positive numeric vector. Search range of Gaussian kernel bandwidth.}
 
-\item{lambda}{positive numeric vector as a search range of regularization parameter for uLSIF.}
+\item{lambda}{positive numeric vector. Search range of regularization parameter for uLSIF.}
 
-\item{kernel_num}{positive integer as number of kernels.}
+\item{kernel_num}{positive integer. Number of kernels.}
 
-\item{fold}{positive integer as a numer of the folds of cross validation for KLIEP.}
+\item{fold}{positive integer. Numer of the folds of cross validation for KLIEP.}
 
 \item{verbose}{logical(default TRUE).}
 }
 \value{
-densratio object that contains the function to estimate density ratio.
+densratio object that contains a function to compute estimated density ratio.
 }
 \description{
-Estimate Density Ratio p_nu(x)/p_de(y)
+Estimate Density Ratio p(x)/q(y)
 }
 \examples{
-set.seed(3)
 x <- rnorm(200, mean = 1, sd = 1/8)
 y <- rnorm(200, mean = 1, sd = 1/2)
-densratio(x, y)
+
+result <- densratio(x, y)
+
+new_x <- seq(0, 2, by = 0.06)
+estimated_density_ratio <- result$compute_density_ratio(new_x)
+
+plot(new_x, estimated_density_ratio, pch=19)
 
 }
-
