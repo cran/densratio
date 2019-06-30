@@ -1,4 +1,4 @@
-uLSIF_search_sigma_and_lambda <- function(x, y, centers, sigma_list, lambda_list, verbose) {
+RuLSIF_search_sigma_and_lambda <- function(x, y, centers, sigma_list, lambda_list, alpha, verbose) {
   nx <- nrow(x)
   ny <- nrow(y)
   n_min <- min(nx, ny)
@@ -10,7 +10,7 @@ uLSIF_search_sigma_and_lambda <- function(x, y, centers, sigma_list, lambda_list
   for (sigma in sigma_list) {
     phi_x <- compute_kernel_Gaussian(x, centers, sigma)
     phi_y <- compute_kernel_Gaussian(y, centers, sigma)
-    H <- crossprod(phi_y) / ny
+    H <- alpha * crossprod(phi_x) / nx + (1 - alpha) * crossprod(phi_y) / ny
     h <- colMeans(phi_x)
     phi_x <- t(phi_x[seq_len(n_min), , drop = FALSE])
     phi_y <- t(phi_y[seq_len(n_min), , drop = FALSE])

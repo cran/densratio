@@ -2,15 +2,16 @@
 % Please edit documentation in R/uLSIF.R
 \name{uLSIF}
 \alias{uLSIF}
-\title{Estimate Density Ratio p(x)/q(y) by uLSIF (unconstrained Least-Square Importance Fitting)}
+\title{Estimate Density Ratio p(x)/q(x) by uLSIF (unconstrained Least-Square Importance Fitting)}
 \usage{
-uLSIF(x, y, sigma = 10^seq(-3, 1, length.out = 9), lambda = 10^seq(-3,
-  1, length.out = 9), kernel_num = 100, verbose = TRUE)
+uLSIF(x1, x2, sigma = 10^seq(-3, 1, length.out = 9),
+  lambda = 10^seq(-3, 1, length.out = 9), kernel_num = 100,
+  verbose = TRUE)
 }
 \arguments{
-\item{x}{numeric vector or matrix. Data from a numerator distribution p(x).}
+\item{x1}{numeric vector or matrix. Data from a numerator distribution p(x).}
 
-\item{y}{numeric vector or matrix. Data from a denominator distribution q(y).}
+\item{x2}{numeric vector or matrix. Data from a denominator distribution q(x).}
 
 \item{sigma}{positive numeric vector. Search range of Gaussian kernel bandwidth.}
 
@@ -24,5 +25,5 @@ uLSIF(x, y, sigma = 10^seq(-3, 1, length.out = 9), lambda = 10^seq(-3,
 uLSIF object that contains a function to compute estimated density ratio.
 }
 \description{
-Estimate Density Ratio p(x)/q(y) by uLSIF (unconstrained Least-Square Importance Fitting)
+Estimate Density Ratio p(x)/q(x) by uLSIF (unconstrained Least-Square Importance Fitting)
 }

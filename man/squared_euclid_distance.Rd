@@ -12,7 +12,7 @@ squared_euclid_distance(x, y)
 \item{y}{a numeric vector.}
 }
 \value{
-squared euclid distance
+squared Euclid distance
 }
 \description{
 Compute Squared Euclid Distance

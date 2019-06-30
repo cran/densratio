@@ -15,7 +15,7 @@ kernel_Gaussian <- function(x, y, sigma) {
 #' @param x a numeric vector.
 #' @param y a numeric vector.
 #'
-#' @return squared euclid distance
+#' @return squared Euclid distance
 squared_euclid_distance <- function(x, y) {
   sum((x - y) ^ 2)
 }
